@@ -8,3 +8,5 @@ models:
         data_tests: [unique, not_null]
   - name: agg_daily_sales
     description: Completed sales by order_date x channel x category.
+  - name: daily_sales_narrative
+    description: AI-written daily summary (Cortex AI_AGG over AGG_DAILY_SALES). Incremental by order_date.
