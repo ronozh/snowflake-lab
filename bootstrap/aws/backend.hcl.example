@@ -1,0 +1,4 @@
+# Copy to backend.hcl (gitignored) and fill in.
+#   terraform init -backend-config=backend.hcl
+bucket = "snowflake-lab-tfstate-<aws_account_id>"
+region = "ap-southeast-2"

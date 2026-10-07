@@ -1,0 +1,30 @@
+# Local-only docs (for now)
+plan/
+cheatsheet/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+backend.hcl
+crash.log
+
+# Secrets / keys
+*.p8
+*.pem
+*.key
+.env
+.env.*
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Python / OS
+.venv/
+__pycache__/
+.DS_Store
