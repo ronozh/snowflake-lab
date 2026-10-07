@@ -13,7 +13,7 @@ locals {
   iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.iam_role}"
   external_id  = "snowflake-lab-${var.env}"
   stage_fqn    = snowflake_stage_external_s3.ecommerce.fully_qualified_name
-  ff_fqn       = snowflake_file_format_csv.ecommerce.fully_qualified_name
+  ff_fqn       = "${snowflake_database.this.name}.LANDING.${snowflake_file_format_csv.ecommerce.name}"
 
   # One definition per feed drives table DDL, pipe COPY and RELOAD_FILES.
   feeds = {
@@ -65,7 +65,7 @@ locals {
     "COPY INTO ${local.bronze_table[f]} (",
     join(", ", concat([for c in cols : c[0]], [for p in local.provenance : p[0]])),
     ") FROM (SELECT ",
-    join(", ", concat([for i, _ in cols : "$${i + 1}"], [for p in local.provenance : p[2]])),
+    join(", ", concat([for i, _ in cols : format("$%d", i + 1)], [for p in local.provenance : p[2]])),
     " FROM @${local.stage_fqn}/${f}/) FILE_FORMAT = (FORMAT_NAME = '${local.ff_fqn}')",
   ]) }
 }
