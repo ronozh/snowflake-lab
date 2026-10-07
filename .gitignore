@@ -28,3 +28,6 @@ dbt/dbt_packages/
 .venv/
 __pycache__/
 .DS_Store
+
+# Local-only notes
+gotcha.md

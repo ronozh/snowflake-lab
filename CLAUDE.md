@@ -8,6 +8,7 @@ Production-pattern Snowflake project: S3 landing → Snowflake bronze/silver/gol
 - Never commit secrets, keys, state, tfvars, account-specific config. Public repo.
 - Commit locally freely; push only when asked. Solo: push to `main`, no PRs.
 - Keep `cheatsheet/` updated with every new command (once, explained).
+- Log every error/issue + fix in `gotcha.md` (gitignored), concisely.
 
 ## Access
 - AWS: `--profile dpivoted` (SSO admin, ap-southeast-2). Never root.
