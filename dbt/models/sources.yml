@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: Mirrors landing 1:1 per file. Loaded by Snowpipe; owned by Terraform.
+    database: "{{ target.database }}"
+    schema: BRONZE
+    tables:
+      - name: transaction
+      - name: customer
+      - name: product
+      - name: campaign

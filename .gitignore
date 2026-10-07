@@ -19,6 +19,7 @@ crash.log
 *.key
 .env
 .env.*
+!.env.example
 
 # dbt
 dbt/target/
@@ -32,3 +33,6 @@ __pycache__/
 
 # Local-only notes
 gotcha.md
+
+# dbt
+.user.yml

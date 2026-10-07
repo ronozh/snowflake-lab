@@ -1,0 +1,15 @@
+# All values from env vars: nothing account-specific in the repo.
+# Locally: set -a; source dbt/.env; set +a   (see .env.example). CI: GitHub secrets.
+snowlab:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT') }}"      # <org>-<account>
+      user: "{{ env_var('DBT_SNOWFLAKE_USER') }}"
+      private_key_path: "{{ env_var('DBT_SNOWFLAKE_PRIVATE_KEY_PATH') }}"
+      role: SNOWLAB_DEV_TRANSFORMER
+      warehouse: SNOWLAB_DEV_WH
+      database: SNOWLAB_DEV
+      schema: SILVER
+      threads: 4

@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: fct_sales
+    description: One row per transaction (all statuses), enriched with current customer/product/campaign attributes.
+    columns:
+      - name: transaction_id
+        data_tests: [unique, not_null]
+  - name: agg_daily_sales
+    description: Completed sales by order_date x channel x category.
