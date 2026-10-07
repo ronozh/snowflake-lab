@@ -22,3 +22,4 @@ echo "env dev secrets"
 gh secret set SNOWFLAKE_PRIVATE_KEY -R "$repo" --env dev < ~/.snowflake/keys/terraform_svc.p8
 gh secret set TFVARS_AWS            -R "$repo" --env dev < terraform/aws/terraform.tfvars
 gh secret set TFVARS_SNOWFLAKE_ENV  -R "$repo" --env dev < terraform/snowflake/env/dev.tfvars
+gh secret set SNOWFLAKE_DEPLOY_PRIVATE_KEY -R "$repo" --env dev < ~/.snowflake/keys/snowlab_dev_deploy_svc.p8

@@ -1,0 +1,55 @@
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dbt/**"
+      - ".github/workflows/pipeline.yml"
+  schedule:
+    - cron: "0 20 * * *" # daily, ~06:00/07:00 Sydney
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline-dev
+  cancel-in-progress: false
+
+env:
+  DBT_VERSION: "2.0.6"
+
+jobs:
+  dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DBT_SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}-${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+      DBT_SNOWFLAKE_USER: SNOWLAB_DEV_DEPLOY_SVC
+      DBT_PROFILES_DIR: .
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install dbt Fusion (pinned)
+        run: |
+          curl -fsSL https://public.cdn.getdbt.com/fs/install/install.sh \
+            | sh -s -- --version "$DBT_VERSION" --to "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy key
+        env:
+          KEY: ${{ secrets.SNOWFLAKE_DEPLOY_PRIVATE_KEY }}
+        run: |
+          key="$RUNNER_TEMP/deploy.p8"
+          install -m 600 /dev/null "$key"
+          printf '%s\n' "$KEY" > "$key"
+          echo "DBT_SNOWFLAKE_PRIVATE_KEY_PATH=$key" >> "$GITHUB_ENV"
+
+      - name: dbt build
+        working-directory: dbt
+        run: |
+          dbt --version
+          dbt build
