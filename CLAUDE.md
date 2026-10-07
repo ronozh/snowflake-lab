@@ -14,4 +14,4 @@ Production-pattern Snowflake project: S3 landing → Snowflake bronze/silver/gol
 - Snowflake: `snow` connection `snowlab` (personal, key-pair). Use `--format JSON | jq`. Read-only unless asked.
 
 ## Layers
-landing = S3 files, never modified · bronze = tables, 1:1, typed, provenance, append-only · silver = views, latest file · gold = business tables.
+landing = S3 files (versioned = audit) · bronze = tables mirroring landing 1:1 per file, typed, provenance; append-only per file, corrections replace whole files (`RELOAD_FILES`) · silver = views, latest file · gold = business tables.
