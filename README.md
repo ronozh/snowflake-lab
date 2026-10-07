@@ -13,6 +13,8 @@ data/sample ─ingest/upload.sh─▶ S3 landing (versioned) ─S3 event─▶ S
                                                                        Streamlit dashboard (APP.SALES_DASHBOARD)
 ```
 
+**Tutorial:** [doc/tutorial](doc/tutorial/README.md) (architecture, Terraform, dbt, Cortex AI, Streamlit, Snowsight walkthrough).
+
 ## Layout
 
 | Path | What | Deployed by |
@@ -25,6 +27,7 @@ data/sample ─ingest/upload.sh─▶ S3 landing (versioned) ─S3 event─▶ S
 | `streamlit/` | Dashboard + Cortex Analyst chat | `pipeline.yml` |
 | `ingest/upload.sh` | Upload sample days to S3 | You |
 | `data/sample/` | 7 days of synthetic e-commerce files | — |
+| `doc/tutorial/` | How it all works, topic by topic | — |
 | `scripts/` | CI helper, secret sync, GitHub hardening, `ask.sh` (Cortex Analyst), `nuke.sh` | You / CI |
 
 ## Run
