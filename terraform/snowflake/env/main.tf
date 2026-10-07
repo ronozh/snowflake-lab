@@ -11,7 +11,7 @@ resource "snowflake_warehouse" "this" {
   auto_suspend        = 60
   auto_resume         = true
   initially_suspended = true
-  comment             = "snowflake-lab ${var.env}"
+  comment             = "snowflake-lab ${var.env} (managed by Terraform)"
 
   lifecycle {
     ignore_changes = [resource_monitor] # assigned below as ACCOUNTADMIN
