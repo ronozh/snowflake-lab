@@ -199,8 +199,8 @@ resource "aws_s3_bucket_notification" "landing" {
 }
 
 # --- Corrections ----------------------------------------------------------------------
-# CALL BRONZE.RELOAD_FILES('transaction', '.*transaction/2026-01-01/.*');
-# Pattern must match the whole _src_file path (start with .*).
+# CALL BRONZE.RELOAD_FILES('transaction', '.*transaction/2026-01-01/.*[.]csv');
+# Pattern must match the whole path (start with .*) and end with [.]csv.
 resource "snowflake_procedure_sql" "reload_files" {
   database    = snowflake_database.this.name
   schema      = snowflake_schema.this["BRONZE"].name
@@ -224,6 +224,10 @@ resource "snowflake_procedure_sql" "reload_files" {
       copy_sql VARCHAR;
       deleted INTEGER;
     BEGIN
+      -- Data files only: a pattern that also matches .ctrl files would fail the COPY.
+      IF (NOT ENDSWITH(:FILE_PATTERN, '[.]csv')) THEN
+        RETURN 'FILE_PATTERN must end with [.]csv, e.g. .*transaction/2026-01-01/.*[.]csv';
+      END IF;
       CASE (LOWER(:FEED))
     %{for f, _ in local.feeds~}
         WHEN '${f}' THEN
