@@ -8,12 +8,13 @@ terraform {
     }
   }
 
-  # Enabled after the first apply, then: terraform init -backend-config=backend.hcl -migrate-state
-  # backend "s3" {
-  #   key          = "bootstrap/aws.tfstate"
-  #   encrypt      = true
-  #   use_lockfile = true
-  # }
+  # First apply ran with local state; then migrated here with:
+  #   terraform init -backend-config=backend.hcl -migrate-state
+  backend "s3" {
+    key          = "bootstrap/aws.tfstate"
+    encrypt      = true
+    use_lockfile = true
+  }
 }
 
 provider "aws" {

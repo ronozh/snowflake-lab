@@ -7,12 +7,15 @@ Things Terraform needs before it can run. Done once, by a human with admin right
 ```bash
 export AWS_PROFILE=<admin-sso-profile>
 cd bootstrap/aws
-terraform init && terraform apply                     # local state first
+# First time only: comment out the backend "s3" block in versions.tf (bucket doesn't exist yet).
+terraform init && terraform apply                     # local state
 cp backend.hcl.example backend.hcl                    # fill in bucket + region
-# uncomment the backend "s3" block in versions.tf, then:
+# Restore the backend block, then move state into the bucket:
 terraform init -backend-config=backend.hcl -migrate-state
-rm -f terraform.tfstate terraform.tfstate.backup      # local copy no longer needed
+rm -f terraform.tfstate terraform.tfstate.backup
 ```
+
+Later runs: `terraform init -backend-config=backend.hcl`.
 
 ## 2. Snowflake: `TERRAFORM_SVC`
 
