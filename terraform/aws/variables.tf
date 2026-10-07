@@ -15,6 +15,16 @@ variable "github_repo" {
   default     = "ronozh/snowflake-lab"
 }
 
+variable "github_oidc_sub_prefix" {
+  description = <<-EOT
+    OIDC `sub` prefix GitHub sends for this repo. This repo uses the immutable format
+    repo:<owner>@<owner_id>/<repo>@<repo_id> (survives renames; blocks repo-name takeover).
+    Check: gh api repos/<owner>/<repo>/actions/oidc/customization/sub --jq .sub_claim_prefix
+  EOT
+  type        = string
+  default     = "repo:ronozh@25116587/snowflake-lab@1408705869"
+}
+
 variable "github_environments" {
   description = "GitHub environments whose jobs may assume the CI role."
   type        = list(string)

@@ -23,8 +23,8 @@ data "aws_iam_policy_document" "ci_trust" {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = concat(
-        ["repo:${var.github_repo}:ref:refs/heads/main"],
-        [for e in var.github_environments : "repo:${var.github_repo}:environment:${e}"],
+        ["${var.github_oidc_sub_prefix}:ref:refs/heads/main"],
+        [for e in var.github_environments : "${var.github_oidc_sub_prefix}:environment:${e}"],
       )
     }
   }
