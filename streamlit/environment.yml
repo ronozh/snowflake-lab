@@ -1,0 +1,7 @@
+# Packages for the warehouse runtime (Snowflake Anaconda channel).
+# Without a pin the runtime uses an old Streamlit that lacks st.chat_input / st.chat_message.
+name: sf_env
+channels:
+  - snowflake
+dependencies:
+  - streamlit=1.52.2

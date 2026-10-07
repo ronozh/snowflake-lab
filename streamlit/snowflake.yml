@@ -15,6 +15,7 @@ entities:
     main_file: streamlit_app.py
     artifacts:
       - streamlit_app.py
+      - environment.yml
 env:
   APP_DATABASE: SNOWLAB_DEV
   APP_WAREHOUSE: SNOWLAB_DEV_WH

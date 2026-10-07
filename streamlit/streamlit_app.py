@@ -83,7 +83,7 @@ with tab_dash:
                 from {FCT} where {where} group by all order by net_revenue desc limit 10""",
             params,
         ),
-        use_container_width=True,
+        width="stretch",
     )
 
     # Step 9: AI-written daily summary (table may not exist yet).
@@ -128,7 +128,7 @@ with tab_ask:
                     st.warning("Generated SQL is not a single SELECT; not executed.")
                     continue
                 df = query(stmt)  # cached: reruns don't re-execute history
-                st.dataframe(df, use_container_width=True)
+                st.dataframe(df, width="stretch")
                 if df.shape[1] == 2 and df.shape[0] > 1:
                     st.bar_chart(df.set_index(df.columns[0]))
             elif item["type"] == "suggestions":
