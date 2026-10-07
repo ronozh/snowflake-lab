@@ -1,5 +1,6 @@
 # Local-only docs (for now)
-plan/
+plan/*
+!plan/phase02-production/
 cheatsheet/
 
 # Terraform

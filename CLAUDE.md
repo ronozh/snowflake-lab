@@ -5,7 +5,7 @@ Production-pattern Snowflake project: S3 landing → Snowflake bronze/silver/gol
 ## Rules
 - Responses: very concise, clear.
 - Work step by step per `plan/phase02-production/README.md`. Each step: write `NN-<step>.md` (Goal / Achieves / Why before next step first) → review → build → verify → next.
-- Never commit secrets, keys, state, tfvars, account-specific config. Public repo.
+- Never commit secrets, keys, state, tfvars, account-specific config. Public repo (incl. `plan/phase02-production/`).
 - Commit locally freely; push only when asked. Solo: push to `main`, no PRs.
 - Keep `cheatsheet/` updated with every new command (once, explained).
 - Log every error/issue + fix in `gotcha.md` (gitignored), concisely.
