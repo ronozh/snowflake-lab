@@ -103,6 +103,20 @@ resource "snowflake_grant_privileges_to_account_role" "transformer_bronze_future
   }
 }
 
+# Plus tables that already exist (future grants don't cover them).
+resource "snowflake_grant_privileges_to_account_role" "transformer_bronze_all" {
+  provider          = snowflake.securityadmin
+  account_role_name = snowflake_account_role.transformer.name
+  privileges        = ["SELECT"]
+  on_schema_object {
+    all {
+      object_type_plural = "TABLES"
+      in_schema          = snowflake_schema.this["BRONZE"].fully_qualified_name
+    }
+  }
+  depends_on = [snowflake_execute.bronze_table]
+}
+
 resource "snowflake_grant_privileges_to_account_role" "transformer_build" {
   provider          = snowflake.securityadmin
   for_each          = toset(["SILVER", "GOLD"])

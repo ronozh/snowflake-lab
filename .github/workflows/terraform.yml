@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "terraform/**"
+      - "bootstrap/**"
       - "scripts/ci/tf-apply.sh"
       - ".github/workflows/terraform.yml"
   workflow_dispatch:
@@ -12,6 +13,10 @@ on:
 
 permissions:
   contents: read
+
+defaults:
+  run:
+    shell: bash # -eo pipefail
 
 concurrency:
   group: terraform
@@ -51,12 +56,6 @@ jobs:
     permissions:
       contents: read
       id-token: write # GitHub OIDC -> AWS
-    env:
-      SNOWFLAKE_ORGANIZATION_NAME: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}
-      SNOWFLAKE_ACCOUNT_NAME: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
-      SNOWFLAKE_USER: TERRAFORM_SVC
-      SNOWFLAKE_AUTHENTICATOR: SNOWFLAKE_JWT
-      SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -85,9 +84,17 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
+      # TERRAFORM_SVC key only in the steps that need it (not visible to third-party actions).
       - name: aws
         run: scripts/ci/tf-apply.sh aws
       - name: snowflake/account
         run: scripts/ci/tf-apply.sh snowflake/account
+        env: &snowflake
+          SNOWFLAKE_ORGANIZATION_NAME: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}
+          SNOWFLAKE_ACCOUNT_NAME: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+          SNOWFLAKE_USER: TERRAFORM_SVC
+          SNOWFLAKE_AUTHENTICATOR: SNOWFLAKE_JWT
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
       - name: snowflake/env (dev)
         run: scripts/ci/tf-apply.sh snowflake/env dev
+        env: *snowflake

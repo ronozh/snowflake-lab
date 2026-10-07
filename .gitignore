@@ -9,6 +9,7 @@ cheatsheet/
 *.tfplan
 tfplan
 *.tfvars
+*.tfvars.json
 !*.tfvars.example
 backend.hcl
 crash.log

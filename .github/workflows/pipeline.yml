@@ -14,6 +14,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash # -eo pipefail: a failed command in a pipe fails the step
+
 concurrency:
   group: pipeline-dev
   cancel-in-progress: false
@@ -69,6 +73,6 @@ jobs:
           conn=(-x --account "$DBT_SNOWFLAKE_ACCOUNT" --user "$DBT_SNOWFLAKE_USER"
                 --authenticator SNOWFLAKE_JWT --private-key-file "$DBT_SNOWFLAKE_PRIVATE_KEY_PATH"
                 --role SNOWLAB_DEV_TRANSFORMER --warehouse SNOWLAB_DEV_WH --database SNOWLAB_DEV)
-          snow streamlit deploy --replace "${conn[@]}" | grep -v 'available under'
+          snow streamlit deploy --replace "${conn[@]}" | { grep -v 'available under' || true; }  # URL has lowercase account id (masking is case-sensitive)
           snow sql "${conn[@]}" -q "GRANT USAGE ON STREAMLIT SNOWLAB_DEV.APP.SALES_DASHBOARD TO ROLE SNOWLAB_DEV_ANALYST" >/dev/null
           echo "deployed SNOWLAB_DEV.APP.SALES_DASHBOARD"

@@ -37,12 +37,12 @@ scripts/ask.sh "What was net revenue by channel?"   # Cortex Analyst
 ```
 
 Infrastructure changes: edit `terraform/**`, push to `main` → CI applies. Corrections to a landed file:
-overwrite it in S3, then `CALL SNOWLAB_DEV.BRONZE.RELOAD_FILES('<feed>', '.*<feed>/<date>/.*[.]csv')`.
+overwrite it in S3, then as `SYSADMIN`: `CALL SNOWLAB_DEV.BRONZE.RELOAD_FILES('<feed>', '.*<feed>/<date>/.*[.]csv')`.
 
 ## Security (public repo)
 
 - No secrets, keys, state, tfvars or account identifiers in git. Local config lives in gitignored `backend.hcl`, `*.tfvars`, `.env`; CI gets it from GitHub secrets (`scripts/sync-ci-secrets.sh`).
-- AWS via GitHub OIDC (immutable subject, `main`/`dev` only). Snowflake via key-pair `TYPE = SERVICE` users.
+- AWS via GitHub OIDC (immutable subject; only jobs in the `dev` environment, which deploys from `main` only). Snowflake via key-pair `TYPE = SERVICE` users.
 - Actions allowlist + SHA pinning, read-only default token, fork-PR approval, `dev` environment limited to `main`. Logs never print plans.
 
 ## Prerequisites

@@ -8,4 +8,6 @@ with src as (
 )
 select *
 from src
+-- Latest file, and latest load of that file (see slv_transaction).
 qualify dense_rank() over (order by _file_date desc, _src_file desc) = 1
+    and dense_rank() over (partition by _src_file order by _loaded_at desc) = 1

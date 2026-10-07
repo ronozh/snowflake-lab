@@ -1,5 +1,6 @@
-# AWS budgets ALERT; they cannot cap spend. Real caps: nothing always-on,
-# plus Snowflake resource monitors.
+# AWS budgets ALERT; they cannot cap spend. Real caps: nothing always-on, plus
+# Snowflake resource monitors (warehouses only: Snowpipe and Cortex AI serverless
+# credits are NOT capped by them).
 
 # Not KMS-encrypted on purpose: Budgets cannot publish to a topic encrypted with
 # the AWS-managed SNS key, and it fails silently. The payload holds no secrets.
@@ -59,6 +60,7 @@ resource "aws_sns_topic_policy" "cost_alerts" {
 }
 
 # Created PENDING: each address must click the confirmation email.
+# Emails go only via these subscriptions (direct budget emails would duplicate).
 resource "aws_sns_topic_subscription" "cost_alerts_email" {
   for_each  = toset(var.alert_emails)
   topic_arn = aws_sns_topic.cost_alerts.arn
@@ -76,23 +78,21 @@ resource "aws_budgets_budget" "monthly" {
   dynamic "notification" {
     for_each = var.alert_thresholds_percent
     content {
-      comparison_operator        = "GREATER_THAN"
-      threshold                  = notification.value
-      threshold_type             = "PERCENTAGE"
-      notification_type          = "ACTUAL"
-      subscriber_sns_topic_arns  = [aws_sns_topic.cost_alerts.arn]
-      subscriber_email_addresses = var.alert_emails
+      comparison_operator       = "GREATER_THAN"
+      threshold                 = notification.value
+      threshold_type            = "PERCENTAGE"
+      notification_type         = "ACTUAL"
+      subscriber_sns_topic_arns = [aws_sns_topic.cost_alerts.arn]
     }
   }
 
   # Fires on trajectory, before the money is spent.
   notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 100
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "FORECASTED"
-    subscriber_sns_topic_arns  = [aws_sns_topic.cost_alerts.arn]
-    subscriber_email_addresses = var.alert_emails
+    comparison_operator       = "GREATER_THAN"
+    threshold                 = 100
+    threshold_type            = "PERCENTAGE"
+    notification_type         = "FORECASTED"
+    subscriber_sns_topic_arns = [aws_sns_topic.cost_alerts.arn]
   }
 
   depends_on = [aws_sns_topic_policy.cost_alerts]

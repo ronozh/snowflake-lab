@@ -26,9 +26,9 @@ variable "github_oidc_sub_prefix" {
 }
 
 variable "github_environments" {
-  description = "GitHub environments whose jobs may assume the CI role."
+  description = "GitHub environments whose jobs may assume the CI role. Add prod with its branch policy (step 11)."
   type        = list(string)
-  default     = ["dev", "prod"]
+  default     = ["dev"]
 }
 
 variable "alert_emails" {

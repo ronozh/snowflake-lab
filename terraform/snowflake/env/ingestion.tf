@@ -170,7 +170,8 @@ resource "snowflake_execute" "bronze_table" {
   execute  = "CREATE OR ALTER TABLE ${local.bronze_table[each.key]} (${local.table_ddl[each.key]}) COMMENT = 'Bronze: mirrors landing ${each.key} files 1:1'"
   revert   = "SELECT 1"
 
-  depends_on = [snowflake_schema.this]
+  # Future grant must exist before tables are created, or TRANSFORMER can't read them.
+  depends_on = [snowflake_schema.this, snowflake_grant_privileges_to_account_role.transformer_bronze_future]
 }
 
 # --- Snowpipes ----------------------------------------------------------------------
@@ -199,8 +200,9 @@ resource "aws_s3_bucket_notification" "landing" {
 }
 
 # --- Corrections ----------------------------------------------------------------------
-# CALL BRONZE.RELOAD_FILES('transaction', '.*transaction/2026-01-01/.*[.]csv');
+# As SYSADMIN: CALL BRONZE.RELOAD_FILES('transaction', '.*transaction/2026-01-01/.*[.]csv');
 # Pattern must match the whole path (start with .*) and end with [.]csv.
+# Overwrite the file in S3 first; if Snowpipe also reloads it, silver keeps the latest load per file.
 resource "snowflake_procedure_sql" "reload_files" {
   database    = snowflake_database.this.name
   schema      = snowflake_schema.this["BRONZE"].name
@@ -222,11 +224,16 @@ resource "snowflake_procedure_sql" "reload_files" {
     DECLARE
       tbl VARCHAR;
       copy_sql VARCHAR;
+      started TIMESTAMP_LTZ;
+      loaded INTEGER;
       deleted INTEGER;
+      bad_pattern EXCEPTION (-20001, 'FILE_PATTERN must use only [A-Za-z0-9_./*[]-] and end with [.]csv, e.g. .*transaction/2026-01-01/.*[.]csv');
+      bad_feed EXCEPTION (-20002, 'Unknown FEED');
+      nothing_loaded EXCEPTION (-20003, 'No files matched FILE_PATTERN; nothing changed');
     BEGIN
-      -- Data files only: a pattern that also matches .ctrl files would fail the COPY.
-      IF (NOT ENDSWITH(:FILE_PATTERN, '[.]csv')) THEN
-        RETURN 'FILE_PATTERN must end with [.]csv, e.g. .*transaction/2026-01-01/.*[.]csv';
+      -- Allowlist (no quotes/backslashes reach the COPY literal) + data files only.
+      IF (NOT REGEXP_LIKE(:FILE_PATTERN, '^[]A-Za-z0-9_./*[-]+$') OR NOT ENDSWITH(:FILE_PATTERN, '[.]csv')) THEN
+        RAISE bad_pattern;
       END IF;
       CASE (LOWER(:FEED))
     %{for f, _ in local.feeds~}
@@ -235,14 +242,25 @@ resource "snowflake_procedure_sql" "reload_files" {
           copy_sql := '${replace(local.copy_body[f], "'", "''")}';
     %{endfor~}
         ELSE
-          RETURN 'unknown feed: ' || :FEED;
+          RAISE bad_feed;
       END CASE;
+
+      -- Load first, then remove older loads of exactly the files just loaded
+      -- (the same _src_file string identifies files in both steps).
+      started := CURRENT_TIMESTAMP();
       BEGIN TRANSACTION;
-      EXECUTE IMMEDIATE 'DELETE FROM ' || tbl || ' WHERE REGEXP_LIKE(_src_file, ''' || REPLACE(:FILE_PATTERN, '''', '''''') || ''')';
+      EXECUTE IMMEDIATE copy_sql || ' PATTERN = ''' || :FILE_PATTERN || ''' FORCE = TRUE ON_ERROR = ABORT_STATEMENT';
+      loaded := (SELECT COUNT(*) FROM IDENTIFIER(:tbl) WHERE _loaded_at >= :started);
+      IF (loaded = 0) THEN
+        ROLLBACK;
+        RAISE nothing_loaded;
+      END IF;
+      DELETE FROM IDENTIFIER(:tbl)
+       WHERE _loaded_at < :started
+         AND _src_file IN (SELECT DISTINCT _src_file FROM IDENTIFIER(:tbl) WHERE _loaded_at >= :started);
       deleted := SQLROWCOUNT;
-      EXECUTE IMMEDIATE copy_sql || ' PATTERN = ''' || REPLACE(:FILE_PATTERN, '''', '''''') || ''' FORCE = TRUE ON_ERROR = ABORT_STATEMENT';
       COMMIT;
-      RETURN 'deleted ' || deleted || ' rows; reloaded files matching ' || :FILE_PATTERN;
+      RETURN 'loaded ' || loaded || ' rows; removed ' || deleted || ' rows from earlier loads of the same files';
     EXCEPTION
       WHEN OTHER THEN
         ROLLBACK;

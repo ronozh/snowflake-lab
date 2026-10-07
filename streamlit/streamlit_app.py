@@ -107,14 +107,23 @@ with tab_ask:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    def is_read_only(sql: str) -> bool:
+        body = "\n".join(l for l in sql.splitlines() if not l.strip().startswith("--")).strip().rstrip(";")
+        return body.lower().startswith(("select", "with")) and ";" not in body
+
     def render(content, key):
         for i, item in enumerate(content):
             if item["type"] == "text":
                 st.markdown(item["text"])
             elif item["type"] == "sql":
+                stmt = item["statement"]
                 with st.expander("SQL", expanded=False):
-                    st.code(item["statement"], language="sql")
-                df = session.sql(item["statement"]).to_pandas()
+                    st.code(stmt, language="sql")
+                # The app runs with its owner's role: only run a single read-only query.
+                if not is_read_only(stmt):
+                    st.warning("Generated SQL is not a single SELECT; not executed.")
+                    continue
+                df = query(stmt)  # cached: reruns don't re-execute history
                 st.dataframe(df, use_container_width=True)
                 if df.shape[1] == 2 and df.shape[0] > 1:
                     st.bar_chart(df.set_index(df.columns[0]))

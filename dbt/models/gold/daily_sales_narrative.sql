@@ -11,7 +11,8 @@ with days as (
     select distinct order_date
     from {{ ref('fct_sales') }}
     {% if is_incremental() %}
-    where order_date > (select coalesce(max(order_date), '1900-01-01'::date) from {{ this }})
+    -- days not yet summarised (not just later ones: days can land out of order)
+    where order_date not in (select order_date from {{ this }})
     {% endif %}
 ),
 

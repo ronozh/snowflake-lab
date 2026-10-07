@@ -17,22 +17,19 @@ data "aws_iam_policy_document" "ci_trust" {
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
-    # Jobs on main get a ref-based sub; jobs that use a GitHub environment get an
-    # environment-based sub instead. Both forms must be listed.
+    # Only jobs bound to a GitHub environment (deploys limited to main by its branch
+    # policy) may assume the role. Environment jobs send an environment-based sub.
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values = concat(
-        ["${var.github_oidc_sub_prefix}:ref:refs/heads/main"],
-        [for e in var.github_environments : "${var.github_oidc_sub_prefix}:environment:${e}"],
-      )
+      values   = [for e in var.github_environments : "${var.github_oidc_sub_prefix}:environment:${e}"]
     }
   }
 }
 
 resource "aws_iam_role" "ci" {
   name                 = "${var.project}-ci"
-  description          = "GitHub Actions (${var.github_repo}, main + environments). Manages ${var.project}-* only."
+  description          = "GitHub Actions (${var.github_repo}, environments: ${join(", ", var.github_environments)}). Manages ${var.project}-* only."
   assume_role_policy   = data.aws_iam_policy_document.ci_trust.json
   max_session_duration = 3600
 }
