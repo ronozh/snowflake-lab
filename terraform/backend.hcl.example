@@ -1,0 +1,4 @@
+# Copy to backend.hcl (gitignored). Shared by every stack under terraform/:
+#   terraform -chdir=terraform/<stack> init -backend-config=../backend.hcl
+bucket = "snowflake-lab-tfstate-<aws_account_id>"
+region = "ap-southeast-2"
