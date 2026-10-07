@@ -53,3 +53,7 @@ jobs:
         run: |
           dbt --version
           dbt build
+
+      - name: Semantic view (Cortex Analyst)
+        working-directory: dbt
+        run: dbt run-operation deploy_semantic_view
