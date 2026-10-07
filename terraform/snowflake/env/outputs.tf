@@ -17,3 +17,7 @@ output "analyst_role" {
 output "deploy_user" {
   value = snowflake_service_user.deploy.name
 }
+
+output "landing_stage" {
+  value = local.stage_fqn
+}

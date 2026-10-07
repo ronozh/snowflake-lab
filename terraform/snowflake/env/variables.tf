@@ -36,3 +36,8 @@ variable "human_user_roles" {
   description = "Env roles granted to the human user: subset of [ANALYST, TRANSFORMER]."
   type        = list(string)
 }
+
+variable "aws_region" {
+  type    = string
+  default = "ap-southeast-2"
+}
