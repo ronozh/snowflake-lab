@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "dbt/**"
+      - "streamlit/**"
       - ".github/workflows/pipeline.yml"
   schedule:
     - cron: "0 20 * * *" # daily, ~06:00/07:00 Sydney
@@ -19,6 +20,7 @@ concurrency:
 
 env:
   DBT_VERSION: "2.0.6"
+  SNOW_CLI_VERSION: "3.28.0"
 
 jobs:
   dev:
@@ -57,3 +59,16 @@ jobs:
       - name: Semantic view (Cortex Analyst)
         working-directory: dbt
         run: dbt run-operation deploy_semantic_view
+
+      - name: Install Snowflake CLI (pinned)
+        run: pipx install "snowflake-cli==$SNOW_CLI_VERSION"
+
+      - name: Streamlit app
+        working-directory: streamlit
+        run: |
+          conn=(-x --account "$DBT_SNOWFLAKE_ACCOUNT" --user "$DBT_SNOWFLAKE_USER"
+                --authenticator SNOWFLAKE_JWT --private-key-file "$DBT_SNOWFLAKE_PRIVATE_KEY_PATH"
+                --role SNOWLAB_DEV_TRANSFORMER --warehouse SNOWLAB_DEV_WH --database SNOWLAB_DEV)
+          snow streamlit deploy --replace "${conn[@]}" | grep -v 'available under'
+          snow sql "${conn[@]}" -q "GRANT USAGE ON STREAMLIT SNOWLAB_DEV.APP.SALES_DASHBOARD TO ROLE SNOWLAB_DEV_ANALYST" >/dev/null
+          echo "deployed SNOWLAB_DEV.APP.SALES_DASHBOARD"

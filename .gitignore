@@ -36,3 +36,6 @@ gotcha.md
 
 # dbt
 .user.yml
+
+# snow streamlit bundle
+streamlit/output/

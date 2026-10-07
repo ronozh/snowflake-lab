@@ -1,0 +1,17 @@
+definition_version: 2
+# Deploy:  snow streamlit deploy --replace   (database/warehouse from env, default DEV)
+entities:
+  sales_dashboard:
+    type: streamlit
+    identifier:
+      name: SALES_DASHBOARD
+      database: <% ctx.env.APP_DATABASE %>
+      schema: APP
+    query_warehouse: <% ctx.env.APP_WAREHOUSE %>
+    title: "Sales dashboard"
+    main_file: streamlit_app.py
+    artifacts:
+      - streamlit_app.py
+env:
+  APP_DATABASE: SNOWLAB_DEV
+  APP_WAREHOUSE: SNOWLAB_DEV_WH
