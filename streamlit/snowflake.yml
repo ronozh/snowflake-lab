@@ -8,6 +8,9 @@ entities:
       database: <% ctx.env.APP_DATABASE %>
       schema: APP
     query_warehouse: <% ctx.env.APP_WAREHOUSE %>
+    # Warehouse runtime: provides the _snowflake module used to call Cortex Analyst.
+    # (Snowflake now defaults new apps to the container runtime, which lacks it.)
+    runtime_name: SYSTEM$WAREHOUSE_RUNTIME
     title: "Sales dashboard"
     main_file: streamlit_app.py
     artifacts:

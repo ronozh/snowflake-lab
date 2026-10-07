@@ -101,7 +101,11 @@ with tab_dash:
 
 # --- Ask the data (Cortex Analyst) ------------------------------------------------------
 with tab_ask:
-    import _snowflake  # available only inside Snowflake
+    try:
+        import _snowflake  # warehouse runtime only (see snowflake.yml runtime_name)
+    except ModuleNotFoundError:
+        st.error("Cortex Analyst chat needs the warehouse runtime (`runtime_name: SYSTEM$WAREHOUSE_RUNTIME`).")
+        st.stop()
 
     st.caption(f"Questions are answered by Cortex Analyst using `{SEMANTIC_VIEW}`.")
     if "messages" not in st.session_state:
