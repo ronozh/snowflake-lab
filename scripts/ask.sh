@@ -10,5 +10,5 @@ body=$(jq -n --arg q "$q" --arg sv "$sv" '{messages:[{role:"user",content:[{type
 curl -sS --fail-with-body -X POST "https://$host.snowflakecomputing.com/api/v2/cortex/analyst/message" \
   -H "Authorization: Bearer $jwt" -H "X-Snowflake-Authorization-Token-Type: KEYPAIR_JWT" \
   -H "Content-Type: application/json" -d "$body" |
-  jq -r 'if .message.content then .message.content[] | (if .type == "sql" then "SQL:\n" + .statement
+  jq -r 'if (.message | type) == "object" then .message.content[] | (if .type == "sql" then "SQL:\n" + .statement
          elif .type == "text" then .text else "\(.type): \(.suggestions // "")" end) else . end'
