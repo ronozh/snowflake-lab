@@ -2,7 +2,7 @@
 
 Snowsight menus move between releases; if a path differs, use the search bar. Switch roles from the user menu (bottom-left). To see what an app user sees, use `SNOWLAB_DEV_ANALYST`.
 
-Deep dive: [Storage integration, IAM role and external stage](storage-integration-and-stage.md) (initial setup, prerequisite for COPY INTO / Snowpipe).
+Deep dive: [Storage integration, IAM role and external stage](storage-integration-and-stage.md) (initial setup, prerequisite for COPY INTO / Snowpipe) · [Snowpipe ingestion](snowpipe-ingestion.md) (S3 file → bronze).
 
 ## Mental model
 

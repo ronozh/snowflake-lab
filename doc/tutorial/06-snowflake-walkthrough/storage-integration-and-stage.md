@@ -190,4 +190,4 @@ UI: Snowsight → **Catalog → Database Explorer → SNOWLAB_DEV → LANDING �
 
 ## Next
 
-With `LIST` working: create the bronze table → test `SELECT ... FROM @stage` → `COPY INTO` → wrap it in a pipe. Code: `ingestion.tf` (`copy_body`, `snowflake_pipe.bronze`).
+With `LIST` working: create the bronze table → test `SELECT ... FROM @stage` → `COPY INTO` → wrap it in a pipe. Next: [Snowpipe ingestion](snowpipe-ingestion.md).
