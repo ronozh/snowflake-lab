@@ -190,4 +190,4 @@ UI: Snowsight → **Catalog → Database Explorer → SNOWLAB_DEV → LANDING �
 
 ## Next
 
-With `LIST` working: create the bronze table → test `SELECT ... FROM @stage` → `COPY INTO` → wrap it in a pipe. See [COPY INTO vs SELECT FROM @stage](../../../plan/phase02-production/04-file-integration.md) and `ingestion.tf` (`copy_body`, pipes).
+With `LIST` working: create the bronze table → test `SELECT ... FROM @stage` → `COPY INTO` → wrap it in a pipe. Code: `ingestion.tf` (`copy_body`, `snowflake_pipe.bronze`).
