@@ -10,5 +10,6 @@ How this project works, from the big picture down to the code. Read in order the
 | 4 | [Cortex AI](04-cortex-ai/README.md) | Semantic view, Cortex Analyst (questions → SQL), AI SQL functions |
 | 5 | [Streamlit](05-streamlit/README.md) | The dashboard + chat app, how it runs inside Snowflake |
 | 6 | [Snowflake walkthrough](06-snowflake-walkthrough/README.md) | Snowsight UI tour, with the AI & ML features step by step |
+| 6a | [Storage integration and stage](06-snowflake-walkthrough/storage-integration-and-stage.md) | How Snowflake reads your S3 bucket: integration, IAM role, external ID, stage |
 
 Conventions: `SNOWLAB_DEV` is the DEV database. `<org>-<account>`, `<account_id>` and `<bucket>` are placeholders (never committed).
