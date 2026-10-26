@@ -3,7 +3,7 @@
 **Goal:** bronze becomes analytics-ready gold through version-controlled dbt models.
 
 **Achieves:**
-- dbt project (`dbt/`), runnable locally with dbt Fusion as the DEV deploy user.
+- dbt project (`dbt/`), runnable locally with dbt Fusion as the DEV deploy user. (Superseded by step 12: now dbt Core.)
 - Silver views: latest file per dimension feed; latest file per day for transactions; `_file_date` derived from the path.
 - Gold tables: `FCT_SALES` (wide intermediate) and `AGG_DAILY_SALES` (completed sales by day/channel/category).
 

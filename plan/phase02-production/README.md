@@ -30,7 +30,7 @@ GitHub (public) ── Actions ──OIDC──▶ AWS (no keys)      key-pair s
 | Identities | AWS via GitHub OIDC (no keys; immutable `sub`, `environment:dev` only). Snowflake via `TYPE = SERVICE` users with key-pair auth; keys only in GitHub `dev` environment secrets |
 | Terraform state | New private, versioned S3 bucket with native locking (`use_lockfile`) |
 | Ingestion | S3 external stage + storage integration + Snowpipe auto-ingest into bronze (EL). dbt starts at bronze (T). Snowpipe loads only on S3 events, never rescans; history and missed files use a bulk `COPY` with the pipe's SQL |
-| Transform | dbt Fusion (pinned 2.0.6), locally and in GitHub Actions (`pipeline.yml`: push, daily 20:00 UTC, manual) |
+| Transform | dbt Core (pinned 1.12.6 + dbt-snowflake 1.12.4, `dbt/requirements.txt`; switched from Fusion in step 12), locally and in GitHub Actions (`pipeline.yml`: push, daily 20:00 UTC, manual) |
 | Layers | landing (S3, versioned) → bronze (tables, **mirrors landing 1:1 per file**, typed, provenance) → silver (views, latest file per date) → gold (tables) |
 | Corrections | Bronze is **append-only per file** and mirrors landing 1:1. A wrong file is overwritten in S3 (versioning keeps the audit trail), then `RELOAD_FILES(feed, pattern)` (as SYSADMIN) loads it with forced `COPY` and removes older loads of the same file, in one transaction; silver also keeps only the latest load per file. No row-level edits. Full rebuild only for disasters |
 | Cost | AWS budget $30/mo (60/90% actual, 100% forecast, via SNS email). Snowflake monitors: account 50, DEV 10 credits/mo (warehouses only, not serverless). XS warehouses, 60s auto-suspend |
@@ -51,6 +51,8 @@ GitHub (public) ── Actions ──OIDC──▶ AWS (no keys)      key-pair s
 | 9 | **[Cortex AI use case](09-cortex-ai.md)** | Daily sales narrative with `AI_AGG` (trial blocks `AI_COMPLETE`); numbers computed in SQL; incremental | Numbers match gold; shown in app | Done |
 | 10 | **[Run it and harden (DEV)](10-run-harden.md)** | 7 days end to end; `nuke.sh`; README; tutorial (`doc/tutorial`); independent code + doc reviews | Bronze = `.ctrl`; gold reconciles; reviews addressed | Done (nuke dry-run only) |
 | 11 | **Promote to PROD** | Move S3 bucket notification to a shared stack; add `prod` to CI role trust + GitHub `prod` environment (approval, `main` only); re-apply `snowflake/env` for prod; `prod` jobs in both workflows; ingest to `prod/`. Decide review items R10 (checksums) and R11 (Cortex region) | Same done-when checks as DEV pass in PROD | Todo |
+| 12 | **[Switch to dbt Core](12-dbt-core.md)** | `dbt/requirements.txt`; local venv; CI installs Core instead of Fusion | `dbt build` passes locally and in CI on Core | In progress |
+| 13 | **[Elementary](13-elementary.md)** | Elementary package; `ELEMENTARY` schema (TF); test results captured on run end | Before/after diff of Elementary tables explained | Todo |
 
 Reviews: [review-01.md](review-01.md) (code: 16 findings, 14 fixed, 2 deferred) · [review-02-docs.md](review-02-docs.md) (tutorial: 15 findings, all fixed).
 

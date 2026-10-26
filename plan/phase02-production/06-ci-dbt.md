@@ -2,7 +2,7 @@
 
 **Goal:** gold rebuilds itself: on every dbt change, on a daily schedule, and on demand.
 
-**Achieves:** `.github/workflows/pipeline.yml` runs `dbt build` as `SNOWLAB_DEV_DEPLOY_SVC` in the `dev` environment, with pinned dbt Fusion.
+**Achieves:** `.github/workflows/pipeline.yml` runs `dbt build` as `SNOWLAB_DEV_DEPLOY_SVC` in the `dev` environment, with pinned dbt Fusion. (Superseded by step 12: now dbt Core.)
 
 **Why before step 7:** the semantic view and app read gold; gold must be refreshed by automation, not a laptop.
 

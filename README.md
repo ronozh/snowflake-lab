@@ -50,4 +50,4 @@ overwrite it in S3, then as `SYSADMIN`: `CALL SNOWLAB_DEV.BRONZE.RELOAD_FILES('<
 
 ## Prerequisites
 
-AWS CLI (SSO), Terraform ≥ 1.10, Snowflake CLI, dbt Fusion, `gh`, `jq`.
+AWS CLI (SSO), Terraform ≥ 1.10, Snowflake CLI, Python 3.13 + `uv` (dbt Core: `uv venv dbt/.venv --python 3.13 && uv pip install -p dbt/.venv -r dbt/requirements.txt`), `gh`, `jq`.

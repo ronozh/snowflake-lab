@@ -87,7 +87,11 @@ cp dbt/.env.example dbt/.env   # fill in account
 
 ## Run it
 
+dbt Core, pinned in `dbt/requirements.txt`, in a project venv (Python 3.13):
+
 ```bash
+uv venv dbt/.venv --python 3.13 && uv pip install -p dbt/.venv -r dbt/requirements.txt   # once
+source dbt/.venv/bin/activate          # this dbt (Core) wins over any other dbt on PATH
 set -a; source dbt/.env; set +a        # account, deploy user, key path, DBT_PROFILES_DIR=.
 cd dbt
 dbt debug                              # connection check
@@ -97,7 +101,7 @@ dbt build --select daily_sales_narrative --full-refresh   # regenerate AI summar
 dbt run-operation deploy_semantic_view
 ```
 
-In CI, `.github/workflows/pipeline.yml` does the same on push (`dbt/**`, `streamlit/**`), daily at 20:00 UTC, or `gh workflow run pipeline`, as `SNOWLAB_DEV_DEPLOY_SVC` with pinned dbt Fusion.
+In CI, `.github/workflows/pipeline.yml` does the same on push (`dbt/**`, `streamlit/**`), daily at 20:00 UTC, or `gh workflow run pipeline`, as `SNOWLAB_DEV_DEPLOY_SVC` with pinned dbt Core (`pip install -r dbt/requirements.txt`).
 
 ## Check results
 
