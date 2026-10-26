@@ -1,6 +1,6 @@
 locals {
   prefix  = "SNOWLAB_${upper(var.env)}"
-  schemas = ["LANDING", "BRONZE", "SILVER", "GOLD", "APP"]
+  schemas = ["LANDING", "BRONZE", "SILVER", "GOLD", "APP", "ELEMENTARY"]
 }
 
 # --- Compute -------------------------------------------------------------------
@@ -44,7 +44,7 @@ resource "snowflake_database" "this" {
 }
 
 # LANDING: external stage + file formats (step 4). BRONZE: Terraform-owned
-# tables mirroring landing. SILVER/GOLD: dbt. APP: Streamlit.
+# tables mirroring landing. SILVER/GOLD: dbt. APP: Streamlit. ELEMENTARY: dbt test results.
 resource "snowflake_schema" "this" {
   for_each = toset(local.schemas)
   database = snowflake_database.this.name

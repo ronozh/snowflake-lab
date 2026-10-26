@@ -1,5 +1,5 @@
 # ANALYST: read gold, use the app and Cortex.
-# TRANSFORMER: inherits ANALYST; reads bronze, builds silver/gold, deploys app + semantic view.
+# TRANSFORMER: inherits ANALYST; reads bronze, builds silver/gold/elementary, deploys app + semantic view.
 # Both roll up to SYSADMIN so admins see everything.
 
 resource "snowflake_account_role" "analyst" {
@@ -82,7 +82,7 @@ resource "snowflake_grant_database_role" "analyst_cortex" {
 
 resource "snowflake_grant_privileges_to_account_role" "transformer_schemas" {
   provider          = snowflake.securityadmin
-  for_each          = toset(["BRONZE", "SILVER"])
+  for_each          = toset(["BRONZE", "SILVER", "ELEMENTARY"])
   account_role_name = snowflake_account_role.transformer.name
   privileges        = ["USAGE"]
   on_schema {
@@ -119,7 +119,7 @@ resource "snowflake_grant_privileges_to_account_role" "transformer_bronze_all" {
 
 resource "snowflake_grant_privileges_to_account_role" "transformer_build" {
   provider          = snowflake.securityadmin
-  for_each          = toset(["SILVER", "GOLD"])
+  for_each          = toset(["SILVER", "GOLD", "ELEMENTARY"])
   account_role_name = snowflake_account_role.transformer.name
   privileges        = ["CREATE VIEW", "CREATE TABLE", "CREATE DYNAMIC TABLE"]
   on_schema {

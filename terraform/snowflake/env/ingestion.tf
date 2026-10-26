@@ -85,6 +85,24 @@ data "aws_iam_policy_document" "snowflake_trust" {
       values   = [local.external_id]
     }
   }
+
+  # Other Snowflake accounts (other projects sharing this AWS account) that also use this role.
+  # Values live in gitignored tfvars: they identify another account.
+  dynamic "statement" {
+    for_each = var.extra_snowflake_trust
+    content {
+      actions = ["sts:AssumeRole"]
+      principals {
+        type        = "AWS"
+        identifiers = [statement.value.iam_user_arn]
+      }
+      condition {
+        test     = "StringEquals"
+        variable = "sts:ExternalId"
+        values   = [statement.value.external_id]
+      }
+    }
+  }
 }
 
 resource "aws_iam_role" "snowflake_s3" {

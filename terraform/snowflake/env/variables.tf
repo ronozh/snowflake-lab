@@ -41,3 +41,12 @@ variable "aws_region" {
   type    = string
   default = "ap-southeast-2"
 }
+
+variable "extra_snowflake_trust" {
+  description = "Extra Snowflake IAM users (from other accounts' storage integrations) trusted by the S3 role."
+  type = list(object({
+    iam_user_arn = string
+    external_id  = string
+  }))
+  default = []
+}
